@@ -42,10 +42,11 @@ const login = async (req, res) => {
       const token = jwt.sign({ user_id: user._id, email }, process.env.TOKEN_KEY, { expiresIn: '2h' })
       user.token = token
       res.status(200).json(user)
+    } else {
+      res.status(404).send('Invalid credentials!')
     }
-    res.status(404).send('Invalid credentials!')
-  } catch (error) {
-    res.status(500).send('There was an error logging in. Please try again.')
+  } catch (err) {
+    console.log(err)
   }
 }
 
