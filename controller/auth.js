@@ -27,25 +27,25 @@ const register = async (req, res) => {
     user.token = token
     res.status(201).json(user)
   } catch (error) {
-    res.send('There was an error. Please try again.')
+    res.status(500).send('There was an error registering. Please try again.')
   }
 }
 
-const login = (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body
-    if (!(email & password)) {
-      return 'All sections are required!'
+    if (!(email && password)) {
+      res.send('All fields are required!')
     }
-    const user = Users.findOne({ email })
-    if (user && (bcrypt.compare(password, user.password))) {
-      const token = jwt.sign({ user_id: Users._id, email }, process.env.TOKEN_KEY, { expiresIn: '2h' })
+    const user = await Users.findOne({ email })
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const token = jwt.sign({ user_id: user._id, email }, process.env.TOKEN_KEY, { expiresIn: '2h' })
       user.token = token
-      res.json(user)
+      res.status(200).json(user)
     }
-    return 'Invalid tokens'
+    res.status(404).send('Invalid credentials!')
   } catch (error) {
-    res.send('Invalid credentials!')
+    res.status(500).send('There was an error logging in. Please try again.')
   }
 }
 

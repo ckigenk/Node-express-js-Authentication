@@ -7,11 +7,7 @@ const auth = require('./route/auth')
 app.use(express.json())
 app.use('/auth', auth)
 
-app.get('/', (req, res) => {
-  res.send('Welcome to Home Page')
-})
-
-const PORT = 3000
+const PORT = 5000
 
 const start = async () => {
   try {
