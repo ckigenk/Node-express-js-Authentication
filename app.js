@@ -4,9 +4,14 @@ const connectDB = require('./db/connect')
 require('dotenv').config()
 const auth = require('./route/auth')
 
+app.use(express.json())
 app.use('/auth', auth)
 
-const PORT = 5001
+app.get('/', (req, res) => {
+  res.send('Welcome to Home Page')
+})
+
+const PORT = 3000
 
 const start = async () => {
   try {

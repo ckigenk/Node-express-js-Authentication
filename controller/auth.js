@@ -4,13 +4,16 @@ const Users = require('../model/users')
 const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body
+
     if (!(firstName && lastName && email && password)) {
-      return ('All sections are required!')
+      res.send('All fields are mandatory!')
     }
-    if (Users.findOne({ email })) {
-      return ('User already exist. Please login')
+    const userExist = await Users.findOne({ email })
+    if (userExist) {
+      res.send('User already exist. Please login')
     }
-    const encryptedPassword = bcrypt.hash(password, 10)
+
+    const encryptedPassword = await bcrypt.hash(password, 10)
 
     const user = await Users.create({
       firstName,
@@ -19,11 +22,12 @@ const register = async (req, res) => {
       password: encryptedPassword
     })
 
-    const token = jwt.sign({ user_id: Users._id, email }, process.env.TOKEN_KEY, { expiresIn: '2h' })
+    const token = jwt.sign({ user_id: user._id, email }, process.env.TOKEN_KEY, { expiresIn: '2h' })
+
     user.token = token
     res.status(201).json(user)
   } catch (error) {
-    return ('There was an error. Please try again.')
+    res.send('There was an error. Please try again.')
   }
 }
 
@@ -39,8 +43,9 @@ const login = (req, res) => {
       user.token = token
       res.json(user)
     }
-  } catch (error) {
     return 'Invalid tokens'
+  } catch (error) {
+    res.send('Invalid credentials!')
   }
 }
 
